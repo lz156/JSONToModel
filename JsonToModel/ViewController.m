@@ -232,7 +232,42 @@
     
     NSDictionary *dict = model.jsonDict;
     PropertyParseModel *propertyJsonModel = [self propertyInfoWithDict:dict];
-    [string appendString:propertyJsonModel.propertyString];
+    //[string appendString:propertyJsonModel.propertyString];
+    
+    if ([propertyJsonModel.stringTypeArray count] > 0) {
+        
+        for (NSString *value in propertyJsonModel.stringTypeArray) {
+            [string appendFormat:@"%@\n",value];
+        }
+        
+        [string appendString:@"\n"];
+    }
+    
+    if ([propertyJsonModel.numberTypeArray count] > 0) {
+        
+        for (NSString *value in propertyJsonModel.numberTypeArray) {
+            [string appendFormat:@"%@\n",value];
+        }
+        
+        [string appendString:@"\n"];
+    }
+    
+    if ([propertyJsonModel.idTypeArray count] > 0) {
+        
+        for (NSString *value in propertyJsonModel.idTypeArray) {
+            [string appendFormat:@"%@\n",value];
+        }
+        
+        [string appendString:@"\n"];
+    }
+    
+    if ([propertyJsonModel.arrayTypeArray count] > 0) {
+        
+        for (NSString *value in propertyJsonModel.arrayTypeArray) {
+            [string appendFormat:@"%@\n",value];
+        }
+    }
+    
     NSArray *classArray = propertyJsonModel.classArray;
 
     [string appendFormat:@"\n\n@end\n\n"];
@@ -247,33 +282,54 @@
 
 - (PropertyParseModel *)propertyInfoWithDict:(NSDictionary *)dict
 {
-    NSMutableString *string    = [NSMutableString string];
-    NSMutableArray *classArray = [NSMutableArray array];
+    //NSMutableString *string    = [NSMutableString string];
+    NSMutableArray *classArray  = [NSMutableArray array];
+    NSMutableArray *stringArray = [NSMutableArray array];
+    NSMutableArray *numberArray = [NSMutableArray array];
+    NSMutableArray *idArray     = [NSMutableArray array];
+    NSMutableArray *array       = [NSMutableArray array];
     
     for (NSString *key in [dict allKeys]) {
         
         id object = dict[key];
         if([object isKindOfClass:[NSString class]])
         {
-            [string appendFormat:@"@property (nonatomic, strong) NSString *%@;\n",key];
+            //[string appendFormat:@"@property (nonatomic, strong) NSString *%@;\n",key];
+            NSString *string = [NSString stringWithFormat:@"@property (nonatomic, strong) NSString *%@;",key];
+            [stringArray addObject:string];
+            
         }
         else if ([object isKindOfClass:[NSNumber class]])
         {
-            [string appendFormat:@"@property (nonatomic, strong) NSNumber *%@;\n",key];
+            //[string appendFormat:@"@property (nonatomic, strong) NSNumber *%@;\n",key];
+            NSString *string = [NSString stringWithFormat:@"@property (nonatomic, strong) NSNumber *%@;",key];
+            [numberArray addObject:string];
+            
         }
         else if ([object isKindOfClass:[NSNull class]])
         {
-            [string appendFormat:@"@property (nonatomic, strong) id %@;\n",key];
+            //[string appendFormat:@"@property (nonatomic, strong) id %@;\n",key];
+            NSString *string = [NSString stringWithFormat:@"@property (nonatomic, strong) id %@;",key];
+            [idArray addObject:string];
+            
         }
         else if ([object isKindOfClass:[NSDictionary class]])
         {
             PropertyParseModel *model = [self propertyInfoWithDict:object];
-            [string appendString:model.propertyString];
+            //[string appendString:model.propertyString];
+            
+            [stringArray addObjectsFromArray:model.stringTypeArray];
+            [numberArray addObjectsFromArray:model.numberTypeArray];
+            [idArray addObjectsFromArray:model.idTypeArray];
+            [array addObjectsFromArray:model.arrayTypeArray];
+            
             [classArray addObjectsFromArray:model.classArray];
         }
         else if ([object isKindOfClass:[NSArray class]])
         {
-            [string appendFormat:@"@property (nonatomic, strong) NSArray *%@;\n",key];
+            //[string appendFormat:@"@property (nonatomic, strong) NSArray *%@;\n",key];
+            NSString *string = [NSString stringWithFormat:@"@property (nonatomic, strong) NSArray *%@;",key];
+            [array addObject:string];
             
             if ([object count] > 0) {
                 
@@ -286,7 +342,14 @@
         }
     }
     
-    PropertyParseModel *model = [PropertyParseModel propertyParseModelWithPropertyString:string classArray:classArray];
+    //PropertyParseModel *model = [PropertyParseModel propertyParseModelWithPropertyString:string classArray:classArray];
+    PropertyParseModel *model = [[PropertyParseModel alloc] init];
+    model.classArray      = classArray;
+    model.stringTypeArray = stringArray;
+    model.numberTypeArray = numberArray;
+    model.idTypeArray     = idArray;
+    model.arrayTypeArray  = array;
+    
     return model;
 }
 

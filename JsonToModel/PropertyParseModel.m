@@ -10,6 +10,7 @@
 
 @implementation PropertyParseModel
 
+/*
 + (instancetype)propertyParseModelWithPropertyString:(NSString *)propertyString classArray:(NSArray *)array
 {
     PropertyParseModel *model = [[PropertyParseModel alloc] init];
@@ -18,6 +19,6 @@
     model.classArray     = array;
     
     return model;
-}
+}*/
 
 @end
